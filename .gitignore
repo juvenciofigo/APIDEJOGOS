@@ -1,16 +1,13 @@
-# Arquivos temporários
+
 *.tmp
 *.swp
 
-# Arquivos de sistema
 .DS_Store
 Thumbs.db
 
-# Diretório de dependências
 node_modules/
 
-# Cache
 .cache/
 
-# Arquivos de configuração do editor (por exemplo, Visual Studio Code)
+
 .vscode/
