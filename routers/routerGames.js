@@ -4,10 +4,42 @@ const Game = require("../models/Game");
 const validateGameFields = require("../validate");
 const { Auth, JWTSECRET } = require("../auth");
 
+var HATEOAS;
+
 router.get("/games", Auth, (req, res) => {
+     HATEOAS = [
+                {
+                    href: "http://localhost:45678/game/",
+                    method: "GET",
+                    rel: "See All Games",
+                },
+                {
+                    href: "http://localhost:45678/game/'id'",
+                    method: "GET",
+                    rel: "See one Games",
+                },
+                ,
+                {
+                    href: "http://localhost:45678/game/",
+                    method: "POST",
+                    rel: "Save a game",
+                },
+                ,
+                {
+                    href: "http://localhost:45678/game/'id'",
+                    method: "DELETE",
+                    rel: "Delete a game",
+                },
+                {
+                    href: "http://localhost:45678/game/edit/'id'",
+                    method: "PUT",
+                    rel: "Update a game",
+                },
+            ];
     Game.findAll()
         .then((games) => {
-            res.status(200).json({ games: games, user: req.user });
+           
+            res.status(200).json({ games: games, HATEOAS });
         })
         .catch((err) => {
             return res.sendStatus(400);
@@ -17,6 +49,35 @@ router.get("/games", Auth, (req, res) => {
 // Show one game
 router.get("/game/:id", Auth, (req, res) => {
     var id = req.params.id;
+    HATEOAS = [
+        {
+            href: "http://localhost:45678/game/",
+            method: "GET",
+            rel: "See All Games",
+        },
+        {
+            href: `http://localhost:45678/game/${id}`,
+            method: "GET",
+            rel: "See one Games",
+        },
+        ,
+        {
+            href: `http://localhost:45678/game/${id}`,
+            method: "POST",
+            rel: "Save a game",
+        },
+        ,
+        {
+            href: `http://localhost:45678/game/${id}`,
+            method: "DELETE",
+            rel: "Delete a game",
+        },
+        {
+            href: `http://localhost:45678/game/edit/${id}`,
+            method: "PUT",
+            rel: "Update a game",
+        },
+    ];
 
     if (isNaN(id)) {
         return res.sendStatus(400);
@@ -24,7 +85,7 @@ router.get("/game/:id", Auth, (req, res) => {
         id = parseInt(id);
         var game = Game.findByPk(id).then((game) => {
             if (game != undefined) {
-                res.status(200).json(game);
+                res.status(200).json({game, HATEOAS});
             } else {
                 res.sendStatus(404);
             }
@@ -35,6 +96,7 @@ router.get("/game/:id", Auth, (req, res) => {
 //Create game
 router.post("/game", Auth, (req, res) => {
     const { title, year, price } = req.body;
+    
 
     if (validateGameFields(title, year, price)) {
         Game.create({
@@ -48,6 +110,7 @@ router.post("/game", Auth, (req, res) => {
     }
 });
 
+// Delete a game
 router.delete("/game/:id", Auth, async (req, res) => {
     var id = req.params.id;
 
